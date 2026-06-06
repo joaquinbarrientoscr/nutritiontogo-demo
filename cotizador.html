@@ -96,9 +96,9 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(-
   cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
   transition:opacity .14s;}
 .share-img-btn:hover{opacity:.88;}
-.rc.sem .share-img-btn{background:var(--g);color:#fff;}
-.rc.men .share-img-btn{background:var(--amb);color:#fff;}
 .share-img-btn.loading{opacity:.6;pointer-events:none;}
+.main-share{background:var(--g);color:#fff;border-radius:14px;
+  font-size:14px;box-shadow:0 3px 14px rgba(74,94,31,.3);}
 
 .res-empty{background:var(--wh);border-radius:16px;padding:26px 16px;
   text-align:center;color:var(--gr);font-size:14px;
@@ -252,144 +252,183 @@ function calcOne(freq){
   return{pr,q,qAC,subAC,subDes,disc,premSur,total:subAC+subDes-disc+premSur+pr.e,checked};
 }
 
-// ── Canvas image generator ────────────────────────────────────────────────────
-function roundRect(ctx,x,y,w,h,r){
+// ── Canvas helpers ────────────────────────────────────────────────────────────
+// rr(ctx, x, y, w, h, tl, tr, br, bl) — per-corner radii
+function rr(ctx,x,y,w,h,tl,tr,br,bl){
+  if(tr===undefined)tr=tl; if(br===undefined)br=tl; if(bl===undefined)bl=tl;
   ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
-  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
-  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
-  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.moveTo(x+tl,y);
+  ctx.lineTo(x+w-tr,y); ctx.arcTo(x+w,y,x+w,y+tr,tr);
+  ctx.lineTo(x+w,y+h-br); ctx.arcTo(x+w,y+h,x+w-br,y+h,br);
+  ctx.lineTo(x+bl,y+h); ctx.arcTo(x,y+h,x,y+h-bl,bl);
+  ctx.lineTo(x,y+tl); ctx.arcTo(x,y,x+tl,y,tl);
   ctx.closePath();
 }
 
-async function generateImage(freq){
+// ── Combined image (semanal + mensual) ───────────────────────────────────────
+async function generateImage(){
   await document.fonts.ready;
-  const data=calcOne(freq);
-  if(!data)return null;
-  const{pr,q,qAC,subAC,subDes,disc,premSur,total,checked}=data;
-  const isAmb=freq==='mensual';
-  const accent=isAmb?'#C87D20':'#4A5E1F';
-  const accentMid=isAmb?'#E8952A':'#6B8B2A';
-  const accentLight=isAmb?'#FFF0D0':'#E8F5E9';
-  const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
-  const fLbl=freq==='semanal'?'Semanal × 5':'Mensual × 20';
+  const sem=calcOne('semanal'), men=calcOne('mensual');
+  if(!sem&&!men) return null;
 
-  // Build line items
-  const items=[];
-  if(s.alm||s.cen){
-    const lbl=[s.alm&&'Almuerzos',s.cen&&'Cenas'].filter(Boolean).join(' + ');
-    items.push({l:`${qAC} platillos · ${lbl}`,v:fmt(subAC),t:'normal'});
-  }
-  if(s.des) items.push({l:`${q} platillos · Desayunos`,v:fmt(subDes),t:'normal'});
-  if(disc>0){
-    const n=checked-1;
-    items.push({l:`Descuento ${n} tiempo${n>1?'s':''} adicional${n>1?'es':''}`,v:`−${fmt(disc)}`,t:'disc'});
-  }
-  if(premSur>0) items.push({l:`${s.prem} platillo${s.prem>1?'s':''} premium (+${fmt(pr.p)} c/u)`,v:`+${fmt(premSur)}`,t:'prem'});
-  items.push({l:'Envío',v:`+${fmt(pr.e)}`,t:'envio'});
+  const hasPrem = s.plan!=='vegetariano';
+  const DPR=2, W=600, PAD=44;
+  const HDR=148, ITEM_H=50, TOTAL_H=92, SEC_PAD=28, DIVIDER=20;
+  const PREM_H = hasPrem ? 84 : 0;
+  const FOOT=72;
 
-  const DPR=2,W=600,PAD=44;
-  const HDR=150,ITEM_H=52,SEP=32,TOTAL_BLOCK=110,FOOT=72;
-  const H=HDR+PAD+items.length*ITEM_H+SEP+TOTAL_BLOCK+PAD+FOOT;
+  function buildItems(data){
+    const{pr,q,qAC,subAC,subDes,disc,premSur,checked}=data;
+    const it=[];
+    if(s.alm||s.cen){
+      const lbl=[s.alm&&'Almuerzos',s.cen&&'Cenas'].filter(Boolean).join(' + ');
+      it.push({l:`${qAC} platillos · ${lbl}`,v:fmt(subAC),t:'normal'});
+    }
+    if(s.des) it.push({l:`${q} platillos · Desayunos`,v:fmt(subDes),t:'normal'});
+    if(disc>0){const n=checked-1; it.push({l:`Descuento ${n} tiempo${n>1?'s':''} adicional${n>1?'es':''}`,v:`−${fmt(disc)}`,t:'disc'});}
+    if(premSur>0) it.push({l:`${s.prem} platillo${s.prem>1?'s':''} premium (+${fmt(data.pr.p)} c/u)`,v:`+${fmt(premSur)}`,t:'prem'});
+    it.push({l:'Envío',v:`+${fmt(pr.e)}`,t:'envio'});
+    return it;
+  }
+
+  const semIt=sem?buildItems(sem):[];
+  const menIt=men?buildItems(men):[];
+  const secH=(items,data)=>SEC_PAD+20+items.length*ITEM_H+16+TOTAL_H+SEC_PAD;
+  const semH=secH(semIt,sem), menH=secH(menIt,men);
+  const H=HDR+semH+DIVIDER+menH+(hasPrem?PREM_H+16:0)+FOOT;
 
   const cv=document.createElement('canvas');
-  cv.width=W*DPR;cv.height=H*DPR;
+  cv.width=W*DPR; cv.height=H*DPR;
   const c=cv.getContext('2d');
   c.scale(DPR,DPR);
 
-  // Background
-  c.fillStyle='#F4F7F0';
-  c.fillRect(0,0,W,H);
+  // ── Outer card background ──
+  c.fillStyle='#F7FAF2';
+  rr(c,0,0,W,H,24); c.fill();
 
-  // Header gradient
+  // ── Header ──
   const grad=c.createLinearGradient(0,0,W,HDR);
-  grad.addColorStop(0,accent);grad.addColorStop(1,accentMid);
+  grad.addColorStop(0,'#4A5E1F'); grad.addColorStop(1,'#6A8A28');
   c.fillStyle=grad;
-  roundRect(c,0,0,W,HDR,24);c.fill();
+  rr(c,0,0,W,HDR, 24,24,0,0); c.fill();
 
-  // Logo
+  c.textAlign='center';
   c.fillStyle='#fff';
   c.font='bold 30px Poppins, sans-serif';
-  c.textAlign='center';
-  c.fillText('Nutrition to Go',W/2,52);
+  c.fillText('Nutrition to Go',W/2,50);
 
-  c.fillStyle='rgba(255,255,255,.7)';
+  c.fillStyle='rgba(255,255,255,.72)';
   c.font='500 13px Inter, sans-serif';
-  c.fillText('Cotización de Paquete',W/2,80);
+  c.fillText('Cotización de Paquete',W/2,78);
 
-  // Plan chip
-  const chipTxt=`${PLAN_LBL[s.plan]}  ·  ${gLbl}  ·  ${fLbl}`;
+  const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
+  const chipTxt=`${PLAN_LBL[s.plan]}  ·  ${gLbl}`;
   c.font='600 14px Poppins, sans-serif';
   const chipW=c.measureText(chipTxt).width+32;
-  roundRect(c,(W-chipW)/2,96,chipW,34,17);
-  c.fillStyle='rgba(255,255,255,.18)';c.fill();
+  rr(c,(W-chipW)/2,93,chipW,34,17); c.fillStyle='rgba(255,255,255,.18)'; c.fill();
   c.fillStyle='#fff';
-  c.fillText(chipTxt,W/2,118);
+  c.fillText(chipTxt,W/2,115);
 
-  // Item rows
-  let y=HDR+PAD;
-  items.forEach(item=>{
-    const isDisc=item.t==='disc',isPrem=item.t==='prem',isEnvio=item.t==='envio';
-    c.fillStyle=isDisc?'#2e5c1a':isPrem?'#C87D20':isEnvio?'#888':'#1A1A1A';
-    c.font=(isDisc||isPrem)?'700 15px Inter, sans-serif':'500 15px Inter, sans-serif';
+  // ── Draw one section ──
+  let y=HDR;
+  function drawSection(items,data,freq){
+    const isAmb=freq==='mensual';
+    const accent=isAmb?'#C87D20':'#4A5E1F';
+    const accentLight=isAmb?'#FFF3E0':'#E8F5E9';
+    const fLbl=isAmb?'Mensual × 20':'Semanal × 5';
+
+    y+=SEC_PAD;
+
+    // Section label
+    c.font='700 11px Poppins, sans-serif';
     c.textAlign='left';
-    c.fillText(item.l,PAD,y);
+    c.fillStyle=accent;
+    c.fillText(fLbl.toUpperCase(),PAD,y+14);
+    // underline
+    c.fillStyle=isAmb?'rgba(200,125,32,.3)':'rgba(74,94,31,.2)';
+    c.fillRect(PAD,y+18,W-PAD*2,1);
+    y+=28;
+
+    // Items
+    items.forEach(item=>{
+      const isDisc=item.t==='disc',isPrem=item.t==='prem',isEnvio=item.t==='envio';
+      c.fillStyle=isDisc?'#2e5c1a':isPrem?'#C87D20':isEnvio?'#999':'#1A1A1A';
+      c.font=(isDisc||isPrem)?'700 14.5px Inter, sans-serif':'500 14.5px Inter, sans-serif';
+      c.textAlign='left'; c.fillText(item.l,PAD,y);
+      c.textAlign='right'; c.fillText(item.v,W-PAD,y);
+      c.fillStyle='rgba(0,0,0,.045)'; c.fillRect(PAD,y+9,W-PAD*2,1);
+      y+=ITEM_H;
+    });
+
+    y+=8;
+
+    // Total block
+    c.fillStyle=accentLight;
+    rr(c,PAD-4,y,W-PAD*2+8,TOTAL_H,12); c.fill();
+    c.fillStyle=accent;
+    c.font='700 11px Poppins, sans-serif';
+    c.textAlign='left';
+    c.fillText('TOTAL ESTIMADO',PAD+12,y+22);
+    c.font='bold 42px Poppins, sans-serif';
     c.textAlign='right';
-    c.fillText(item.v,W-PAD,y);
-    // subtle line
-    c.fillStyle='rgba(0,0,0,.05)';
-    c.fillRect(PAD,y+10,W-PAD*2,1);
-    y+=ITEM_H;
-  });
+    c.fillText(fmt(data.total),W-PAD+4,y+68);
+    c.fillStyle='#999';
+    c.font='400 10.5px Inter, sans-serif';
+    c.textAlign='left';
+    c.fillText('Incluye envío',PAD+12,y+82);
 
-  // Separator
-  y+=8;
-  c.fillStyle=isAmb?'rgba(200,125,32,.25)':'rgba(74,94,31,.2)';
+    y+=TOTAL_H+SEC_PAD;
+  }
+
+  drawSection(semIt,sem,'semanal');
+
+  // ── Divider between sections ──
+  c.fillStyle='rgba(74,94,31,.1)';
   c.fillRect(PAD,y,W-PAD*2,2);
-  y+=SEP-8;
+  y+=DIVIDER;
 
-  // Total block
-  c.fillStyle=accentLight;
-  roundRect(c,PAD-4,y-10,W-PAD*2+8,TOTAL_BLOCK,16);c.fill();
+  drawSection(menIt,men,'mensual');
 
-  c.fillStyle=accent;
-  c.font='700 12px Poppins, sans-serif';
-  c.textAlign='left';
-  c.fillText('TOTAL ESTIMADO',PAD+10,y+16);
+  // ── Premium note ──
+  if(hasPrem){
+    const sp=PR[s.plan].semanal, mp=PR[s.plan].mensual;
+    y+=4;
+    c.fillStyle='#FFF8F0';
+    rr(c,PAD-4,y,W-PAD*2+8,PREM_H,12); c.fill();
+    c.strokeStyle='rgba(200,125,32,.28)'; c.lineWidth=1.5;
+    rr(c,PAD-4,y,W-PAD*2+8,PREM_H,12); c.stroke();
+    c.fillStyle='#C87D20';
+    c.font='700 12px Poppins, sans-serif';
+    c.textAlign='left';
+    c.fillText('⭐  Proteínas premium',PAD+12,y+24);
+    c.fillStyle='#555';
+    c.font='500 12px Inter, sans-serif';
+    c.fillText('Salmón · Camarones · Atún',PAD+12,y+44);
+    c.fillStyle='#777';
+    c.font='400 11.5px Inter, sans-serif';
+    c.fillText(`+${fmt(sp.p)} por platillo en paquete semanal  ·  +${fmt(mp.p)} en mensual`,PAD+12,y+64);
+    y+=PREM_H+16;
+  }
 
-  c.font='bold 46px Poppins, sans-serif';
-  c.textAlign='right';
-  c.fillText(fmt(total),W-PAD+4,y+72);
-
-  c.fillStyle='#888';
-  c.font='400 11px Inter, sans-serif';
-  c.textAlign='left';
-  c.fillText('Incluye envío · sin incluir ajustes finales',PAD+10,y+88);
-
-  y+=TOTAL_BLOCK+PAD;
-
-  // Footer
-  c.fillStyle=accent;
-  roundRect(c,0,y,W,FOOT,{upperLeft:0,upperRight:0,lowerLeft:24,lowerRight:24});
-  roundRect(c,0,y,W,FOOT,24);c.fill();
-
+  // ── Footer ──
+  c.fillStyle='#4A5E1F';
+  rr(c,0,y,W,FOOT, 0,0,24,24); c.fill();
   c.fillStyle='rgba(255,255,255,.65)';
   c.font='400 11px Inter, sans-serif';
   c.textAlign='center';
   c.fillText('Precio estimado · puede variar según selección final de platillos',W/2,y+26);
   c.fillStyle='#fff';
   c.font='700 13px Poppins, sans-serif';
-  c.fillText('Nutrition to Go  ·  8729-5097 | 8897-3740',W/2,y+50);
+  c.fillText('Nutrition to Go  ·  8729-5097 | 8897-3740',W/2,y+52);
 
   return cv;
 }
 
-async function shareImage(freq,btn){
+async function shareImage(btn){
   btn.classList.add('loading');
   btn.textContent='Generando…';
   try{
-    const cv=await generateImage(freq);
+    const cv=await generateImage();
     if(!cv){btn.classList.remove('loading');renderCards();return;}
     cv.toBlob(async blob=>{
       const file=new File([blob],'cotizacion-ntg.png',{type:'image/png'});
@@ -397,10 +436,9 @@ async function shareImage(freq,btn){
         if(navigator.canShare&&navigator.canShare({files:[file]})){
           await navigator.share({title:'Cotización Nutrition to Go',files:[file]});
         } else {
-          // Fallback: download
           const url=URL.createObjectURL(blob);
           const a=document.createElement('a');
-          a.href=url;a.download='cotizacion-ntg.png';a.click();
+          a.href=url; a.download='cotizacion-ntg.png'; a.click();
           setTimeout(()=>URL.revokeObjectURL(url),1000);
         }
       }catch(e){if(e.name!=='AbortError')console.warn(e);}
@@ -428,12 +466,6 @@ function buildCard(freq,data,cls){
     <div class="rc-sep"></div>
     <div class="rc-total">${fmt(total)}</div>
     <div class="rc-sub">Total estimado (envío incluido)</div>
-    <button class="share-img-btn" onclick="shareImage('${freq}',this)">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M18 16c-.8 0-1.5.3-2 .8l-7.1-4.2c0-.2.1-.4.1-.6s0-.4-.1-.6L16 7.2c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .4.1.6L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c0 .2-.1.4-.1.5 0 1.6 1.3 2.9 2.9 2.9S21 20.6 21 19s-1.3-3-3-3z"/>
-      </svg>
-      Generar imagen
-    </button>
   </div>`;
 }
 
@@ -446,7 +478,15 @@ function renderCards(){
   const el=document.getElementById('results');
   if(!checked){el.innerHTML='<div class="res-empty">📋 Seleccioná al menos un tiempo de comida</div>';return;}
   const sem=calcOne('semanal'),men=calcOne('mensual');
-  el.innerHTML=buildCard('semanal',sem,'sem')+buildCard('mensual',men,'men');
+  el.innerHTML=
+    buildCard('semanal',sem,'sem')+
+    buildCard('mensual',men,'men')+
+    `<button class="share-img-btn main-share" style="grid-column:1/-1;margin-top:2px;padding:13px;" onclick="shareImage(this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18 16c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.4.1-.6s0-.4-.1-.6L16 7.2c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .4.1.6L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c0 .2-.1.4-.1.5 0 1.6 1.3 2.9 2.9 2.9S21 20.6 21 19s-1.3-3-3-3z"/>
+      </svg>
+      Generar imagen para compartir
+    </button>`;
 }
 const calc=renderCards;
 
