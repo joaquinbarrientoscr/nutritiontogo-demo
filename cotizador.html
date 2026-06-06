@@ -335,7 +335,7 @@ async function generateImage(){
     const isAmb=freq==='mensual';
     const accent=isAmb?'#C87D20':'#4A5E1F';
     const accentLight=isAmb?'#FFF3E0':'#E8F5E9';
-    const fLbl=isAmb?'Mensual × 20':'Semanal × 5';
+    const fLbl=isAmb?'Mensual':'Semanal';
 
     y+=SEC_PAD;
 
@@ -347,7 +347,7 @@ async function generateImage(){
     // underline
     c.fillStyle=isAmb?'rgba(200,125,32,.3)':'rgba(74,94,31,.2)';
     c.fillRect(PAD,y+18,W-PAD*2,1);
-    y+=28;
+    y+=42;
 
     // Items
     items.forEach(item=>{
