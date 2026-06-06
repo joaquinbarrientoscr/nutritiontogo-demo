@@ -6,8 +6,8 @@
   "scope": "/nutritiontogo-demo/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#4A5E1F",
-  "theme_color": "#4A5E1F",
+  "background_color": "#646d40",
+  "theme_color": "#646d40",
   "lang": "es",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },

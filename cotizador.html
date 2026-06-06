@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cotizador — Nutrition to Go</title>
 <link rel="manifest" href="manifest-cotiz.json">
-<meta name="theme-color" content="#4A5E1F">
+<meta name="theme-color" content="#646d40">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NTG Cotizador">
@@ -18,7 +18,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --g:#4A5E1F;--gm:#8CB340;--gl:#E8F5E9;--ga:#A5D6A7;
+  --g:#646d40;--gm:#8CB340;--gl:#E8F5E9;--ga:#A5D6A7;
   --amb:#C87D20;--ambl:#FFF8F0;
   --dk:#1A1A1A;--gr:#666;--bg:#F4F7F0;--wh:#fff;
   --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
@@ -310,7 +310,7 @@ async function generateImage(){
 
   // ── Header ──
   const grad=c.createLinearGradient(0,0,W,HDR);
-  grad.addColorStop(0,'#4A5E1F'); grad.addColorStop(1,'#6A8A28');
+  grad.addColorStop(0,'#646d40'); grad.addColorStop(1,'#6A8A28');
   c.fillStyle=grad;
   rr(c,0,0,W,HDR, 24,24,0,0); c.fill();
 
@@ -335,7 +335,7 @@ async function generateImage(){
   let y=HDR;
   function drawSection(items,data,freq){
     const isAmb=freq==='mensual';
-    const accent=isAmb?'#C87D20':'#4A5E1F';
+    const accent=isAmb?'#C87D20':'#646d40';
     const accentLight=isAmb?'#FFF3E0':'#E8F5E9';
     const fLbl=isAmb?'Mensual':'Semanal';
 
@@ -413,7 +413,7 @@ async function generateImage(){
   }
 
   // ── Footer ──
-  c.fillStyle='#4A5E1F';
+  c.fillStyle='#646d40';
   rr(c,0,y,W,FOOT, 0,0,24,24); c.fill();
   c.fillStyle='rgba(255,255,255,.65)';
   c.font='400 11px Inter, sans-serif';
