@@ -335,22 +335,23 @@ async function generateImage(){
   c.textAlign='center';
   c.fillText(_ts,W/2,16);
 
-  // Logo izquierda: ntg-logo2-dark (viewBox 435×325, aspect ≈1.338)
-  const logoH=90, logoW=Math.round(logoH*(435/325));
+  // Logo izquierda: tamaño compacto como en el web header
+  const logoH=56, logoW=Math.round(logoH*(435/325));
   c.drawImage(LOGO_IMG, PAD, (HDR-logoH)/2, logoW, logoH);
 
-  // Columna derecha: etiqueta + plan + gramaje
+  // Columna derecha: brand identity (igual que el web header)
   const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
-  c.textAlign='right';
-  c.fillStyle='rgba(255,255,255,.95)';
-  c.font='600 12px Poppins, sans-serif';
-  c.fillText('COTIZACIÓN DE PAQUETE',W-PAD,50);
+  const rX=PAD+logoW+18;
+  c.textAlign='left';
   c.fillStyle='#fff';
-  c.font='bold 22px Poppins, sans-serif';
-  c.fillText(PLAN_LBL[s.plan],W-PAD,76);
-  c.fillStyle='rgba(255,255,255,.92)';
-  c.font='500 15px Inter, sans-serif';
-  c.fillText(`${gLbl} de proteína por platillo`,W-PAD,98);
+  c.font='bold 18px Poppins, sans-serif';
+  c.fillText('Nutrition to Go',rX,66);
+  c.fillStyle='rgba(255,255,255,.72)';
+  c.font='600 10px Poppins, sans-serif';
+  c.fillText('COTIZADOR DE PAQUETES',rX,82);
+  c.fillStyle='rgba(255,255,255,.88)';
+  c.font='500 13px Inter, sans-serif';
+  c.fillText(`${PLAN_LBL[s.plan]}  ·  ${gLbl} de proteína por platillo`,rX,102);
 
   // ── Draw one section ──
   let y=HDR;
