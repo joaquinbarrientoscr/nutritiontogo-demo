@@ -325,10 +325,10 @@ async function generateImage(){
   const _MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const _h=_cr.getHours(),_mi=_cr.getMinutes().toString().padStart(2,'0');
   const _ts=`Cotización generada: ${_cr.getDate()} de ${_MESES[_cr.getMonth()]} de ${_cr.getFullYear()} a las ${(_h%12)||12}:${_mi} ${_h>=12?'PM':'AM'} UTC-6`;
-  c.fillStyle='rgba(255,255,255,.42)';
-  c.font='400 10px Inter, sans-serif';
+  c.fillStyle='rgba(0,0,0,.45)';
+  c.font='400 12px Inter, sans-serif';
   c.textAlign='center';
-  c.fillText(_ts,W/2,15);
+  c.fillText(_ts,W/2,16);
 
   // Logo izquierda: ntg-logo2-dark (viewBox 435×325, aspect ≈1.338)
   const logoH=90, logoW=Math.round(logoH*(435/325));
