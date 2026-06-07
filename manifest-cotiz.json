@@ -10,6 +10,6 @@
   "theme_color": "#a2c037",
   "lang": "es",
   "icons": [
-    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "ntg-logo2-dark.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }
