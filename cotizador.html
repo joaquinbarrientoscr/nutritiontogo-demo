@@ -279,9 +279,9 @@ async function generateImage(){
 
   const hasPrem = s.plan!=='vegetariano';
   const DPR=2, W=600, PAD=44;
-  const HDR=168, ITEM_H=48, TOTAL_H=80, SEC_PAD=24, DIVIDER=20;
+  const HDR=168, ITEM_H=48, TOTAL_H=70, SEC_PAD=24, DIVIDER=20;
   const PREM_H = hasPrem ? 84 : 0;
-  const FOOT=72;
+  const FOOT=90;
 
   function buildItems(data){
     const{pr,q,qAC,subAC,subDes,disc,premSur,checked}=data;
@@ -316,24 +316,22 @@ async function generateImage(){
   c.fillStyle='#a2c037';
   rr(c,0,0,W,HDR, 24,24,0,0); c.fill();
 
-  // Logo: ntg-logo2-dark (viewBox 435×325, aspect ≈1.338) — green rect blends with header
-  const logoH=72, logoW=Math.round(logoH*(435/325));
-  c.drawImage(LOGO_IMG,(W-logoW)/2,14,logoW,logoH);
+  // Logo izquierda: ntg-logo2-dark (viewBox 435×325, aspect ≈1.338)
+  const logoH=90, logoW=Math.round(logoH*(435/325));
+  c.drawImage(LOGO_IMG, PAD, (HDR-logoH)/2, logoW, logoH);
 
-  // Subtitle
-  c.textAlign='center';
-  c.fillStyle='rgba(255,255,255,.85)';
-  c.font='500 13px Inter, sans-serif';
-  c.fillText('Cotización de Paquete',W/2,104);
-
-  // Plan chip
+  // Columna derecha: etiqueta + plan + gramaje
   const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
-  const chipTxt=`${PLAN_LBL[s.plan]}  ·  ${gLbl}`;
-  c.font='600 13px Poppins, sans-serif';
-  const chipW=c.measureText(chipTxt).width+32;
-  rr(c,(W-chipW)/2,116,chipW,32,16); c.fillStyle='rgba(0,0,0,.18)'; c.fill();
+  c.textAlign='right';
+  c.fillStyle='rgba(255,255,255,.7)';
+  c.font='600 11px Poppins, sans-serif';
+  c.fillText('COTIZACIÓN DE PAQUETE',W-PAD,62);
   c.fillStyle='#fff';
-  c.fillText(chipTxt,W/2,136);
+  c.font='bold 20px Poppins, sans-serif';
+  c.fillText(PLAN_LBL[s.plan],W-PAD,88);
+  c.fillStyle='rgba(255,255,255,.85)';
+  c.font='500 14px Inter, sans-serif';
+  c.fillText(gLbl,W-PAD,108);
 
   // ── Draw one section ──
   let y=HDR;
@@ -346,10 +344,10 @@ async function generateImage(){
     y+=SEC_PAD;
 
     // Section label
-    c.font='700 11px Poppins, sans-serif';
+    c.font='700 15px Poppins, sans-serif';
     c.textAlign='left';
     c.fillStyle=accent;
-    c.fillText(fLbl.toUpperCase(),PAD,y+14);
+    c.fillText(fLbl.toUpperCase(),PAD,y+16);
     // underline
     c.fillStyle=isAmb?'rgba(200,125,32,.3)':'rgba(74,94,31,.2)';
     c.fillRect(PAD,y+18,W-PAD*2,1);
@@ -366,22 +364,24 @@ async function generateImage(){
       y+=ITEM_H;
     });
 
-    y+=8;
+    y+=2;
 
     // Total block
     c.fillStyle=accentLight;
     rr(c,PAD-4,y,W-PAD*2+8,TOTAL_H,12); c.fill();
+    // Lado izquierdo: label + "Incluye envío" apilados
     c.fillStyle=accent;
     c.font='700 13px Poppins, sans-serif';
     c.textAlign='left';
     c.fillText('TOTAL ESTIMADO',PAD+12,y+20);
+    c.fillStyle='rgba(0,0,0,.4)';
+    c.font='400 11px Inter, sans-serif';
+    c.fillText('Incluye envío',PAD+12,y+36);
+    // Lado derecho: precio grande
+    c.fillStyle=accent;
     c.font='bold 34px Poppins, sans-serif';
     c.textAlign='right';
-    c.fillText(fmt(data.total),W-PAD+4,y+58);
-    c.fillStyle='#999';
-    c.font='400 11px Inter, sans-serif';
-    c.textAlign='left';
-    c.fillText('Incluye envío',PAD+12,y+72);
+    c.fillText(fmt(data.total),W-PAD+4,y+56);
 
     y+=TOTAL_H+SEC_PAD;
   }
@@ -422,10 +422,10 @@ async function generateImage(){
   c.fillStyle='rgba(255,255,255,.65)';
   c.font='400 11px Inter, sans-serif';
   c.textAlign='center';
-  c.fillText('Precio estimado · puede variar según selección final de platillos',W/2,y+26);
+  c.fillText('Precio estimado · puede variar según selección final de platillos',W/2,y+32);
   c.fillStyle='#fff';
   c.font='700 13px Poppins, sans-serif';
-  c.fillText('Nutrition to Go  ·  8729-5097 | 8897-3740',W/2,y+52);
+  c.fillText('Nutrition to Go  ·  8729-5097 | 8897-3740',W/2,y+58);
 
   return cv;
 }
