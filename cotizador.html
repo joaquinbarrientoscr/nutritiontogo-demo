@@ -300,8 +300,8 @@ async function generateImage(){
   const semIt=sem?buildItems(sem):[];
   const menIt=men?buildItems(men):[];
   const secH=(items)=>{
-    const steps=items.reduce((s,it)=>s+(it.t==='envio'?28:ITEM_H),0);
-    return SEC_PAD+44+steps+2+TOTAL_H+SEC_PAD;
+    const steps=items.reduce((s,it)=>s+(it.t==='envio'?22:ITEM_H),0);
+    return SEC_PAD+50+steps+2+TOTAL_H+SEC_PAD;
   };
   const semH=secH(semIt,sem), menH=secH(menIt,men);
   const H=HDR+semH+DIVIDER+menH+(hasPrem?PREM_H+16:0)+FOOT;
@@ -354,7 +354,7 @@ async function generateImage(){
     // underline
     c.fillStyle=isAmb?'rgba(200,125,32,.3)':'rgba(74,94,31,.2)';
     c.fillRect(PAD,y+20,W-PAD*2,1);
-    y+=44;
+    y+=50;
 
     // Items
     items.forEach(item=>{
@@ -364,7 +364,7 @@ async function generateImage(){
       c.textAlign='left'; c.fillText(item.l,PAD,y);
       c.textAlign='right'; c.fillText(item.v,W-PAD,y);
       c.fillStyle='rgba(0,0,0,.045)'; c.fillRect(PAD,y+8,W-PAD*2,1);
-      y+=isEnvio?28:ITEM_H;
+      y+=isEnvio?22:ITEM_H;
     });
 
     y+=2;
@@ -384,7 +384,7 @@ async function generateImage(){
     c.fillStyle=accent;
     c.font='bold 32px Poppins, sans-serif';
     c.textAlign='right';
-    c.fillText(fmt(data.total),W-PAD+4,y+44);
+    c.fillText(fmt(data.total),W-PAD-16,y+44);
 
     y+=TOTAL_H+SEC_PAD;
   }
@@ -407,14 +407,14 @@ async function generateImage(){
     c.strokeStyle='rgba(200,125,32,.28)'; c.lineWidth=1.5;
     rr(c,PAD-4,y,W-PAD*2+8,PREM_H,12); c.stroke();
     c.fillStyle='#C87D20';
-    c.font='700 12px Poppins, sans-serif';
+    c.font='700 14px Poppins, sans-serif';
     c.textAlign='left';
     c.fillText('⭐  Proteínas premium',PAD+12,y+24);
     c.fillStyle='#555';
-    c.font='500 12px Inter, sans-serif';
+    c.font='500 14px Inter, sans-serif';
     c.fillText('Salmón · Camarones · Atún',PAD+12,y+44);
     c.fillStyle='#777';
-    c.font='400 11.5px Inter, sans-serif';
+    c.font='400 13px Inter, sans-serif';
     c.fillText(`+${fmt(sp.p)} por platillo en paquete semanal  ·  +${fmt(mp.p)} en mensual`,PAD+12,y+64);
     y+=PREM_H+16;
   }
