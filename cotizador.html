@@ -299,7 +299,10 @@ async function generateImage(){
 
   const semIt=sem?buildItems(sem):[];
   const menIt=men?buildItems(men):[];
-  const secH=(items,data)=>SEC_PAD+20+items.length*ITEM_H+16+TOTAL_H+SEC_PAD;
+  const secH=(items)=>{
+    const steps=items.reduce((s,it)=>s+(it.t==='envio'?28:ITEM_H),0);
+    return SEC_PAD+44+steps+2+TOTAL_H+SEC_PAD;
+  };
   const semH=secH(semIt,sem), menH=secH(menIt,men);
   const H=HDR+semH+DIVIDER+menH+(hasPrem?PREM_H+16:0)+FOOT;
 
