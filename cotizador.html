@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cotizador — Nutrition to Go</title>
 <link rel="manifest" href="manifest-cotiz.json">
-<meta name="theme-color" content="#646d40">
+<meta name="theme-color" content="#d6e094">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NTG Cotizador">
@@ -18,18 +18,18 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --g:#646d40;--gm:#8CB340;--gl:#E8F5E9;--ga:#A5D6A7;
+  --g:#d6e094;--gd:#3d4726;--gm:#8CB340;--gl:#eef5c8;--ga:#c8d980;
   --amb:#C87D20;--ambl:#FFF8F0;
   --dk:#1A1A1A;--gr:#666;--bg:#F4F7F0;--wh:#fff;
   --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
 }
 html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(--dk);}
 
-.app-hdr{background:var(--g);color:#fff;padding:18px 20px 16px;
+.app-hdr{background:var(--g);color:var(--gd);padding:18px 20px 16px;
   text-align:center;position:sticky;top:0;z-index:10;
   box-shadow:0 2px 14px rgba(0,0,0,.2);}
 .app-hdr .logo{font-family:var(--fh);font-size:19px;font-weight:800;}
-.app-hdr .logo em{color:#C6E24A;font-style:normal;}
+.app-hdr .logo em{color:var(--gd);font-style:normal;opacity:.6;}
 .app-hdr .sub{font-size:11px;opacity:.75;margin-top:2px;}
 
 .container{max-width:480px;margin:0 auto;padding:18px 14px 48px;}
@@ -46,7 +46,7 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(-
   padding:8px 15px;font-family:var(--fh);font-size:13px;font-weight:600;
   cursor:pointer;color:#666;transition:all .14s;user-select:none;}
 .pill:hover{border-color:var(--g);color:var(--g);}
-.pill.on{background:var(--g);border-color:var(--g);color:#fff;}
+.pill.on{background:var(--g);border-color:var(--ga);color:var(--gd);}
 
 .meals{display:flex;flex-direction:column;gap:8px;}
 .meal{display:flex;align-items:center;gap:11px;cursor:pointer;
@@ -59,7 +59,7 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(-
 .meal-dot{width:20px;height:20px;border-radius:50%;border:2px solid #ccc;
   flex-shrink:0;display:flex;align-items:center;justify-content:center;
   font-size:11px;font-weight:800;transition:all .14px;}
-.meal.on .meal-dot{background:var(--g);border-color:var(--g);color:#fff;}
+.meal.on .meal-dot{background:var(--ga);border-color:var(--ga);color:var(--gd);}
 
 .spinner{display:flex;align-items:center;border:2px solid #eee;
   border-radius:12px;overflow:hidden;width:fit-content;}
@@ -99,8 +99,8 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(-
   transition:opacity .14s;}
 .share-img-btn:hover{opacity:.88;}
 .share-img-btn.loading{opacity:.6;pointer-events:none;}
-.main-share{background:var(--g);color:#fff;border-radius:14px;
-  font-size:14px;box-shadow:0 3px 14px rgba(74,94,31,.3);}
+.main-share{background:var(--g);color:var(--gd);border-radius:14px;
+  font-size:14px;box-shadow:0 3px 14px rgba(100,109,64,.25);}
 
 .res-empty{background:var(--wh);border-radius:16px;padding:26px 16px;
   text-align:center;color:var(--gr);font-size:14px;
@@ -114,12 +114,12 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(-
 .footer a{color:var(--g);text-decoration:none;font-weight:600;}
 
 .install-bar{display:none;position:fixed;bottom:0;left:0;right:0;
-  background:var(--g);color:#fff;padding:13px 18px;
+  background:var(--g);color:var(--gd);padding:13px 18px;
   align-items:center;gap:10px;z-index:50;
   box-shadow:0 -3px 16px rgba(0,0,0,.2);}
 .install-bar.show{display:flex;}
 .install-bar p{flex:1;font-size:12.5px;font-weight:500;}
-.ibtn{background:#C6E24A;color:var(--g);border:none;border-radius:20px;
+.ibtn{background:var(--gd);color:#fff;border:none;border-radius:20px;
   padding:7px 16px;font-family:var(--fh);font-size:12px;font-weight:700;cursor:pointer;}
 .idis{background:none;border:none;color:#fff;opacity:.6;font-size:22px;cursor:pointer;}
 </style>
@@ -267,9 +267,14 @@ function rr(ctx,x,y,w,h,tl,tr,br,bl){
   ctx.closePath();
 }
 
+// ── Logo preload ──────────────────────────────────────────────────────────────
+const LOGO_IMG = new Image();
+LOGO_IMG.src = 'icon-512-light.png';
+
 // ── Combined image (semanal + mensual) ───────────────────────────────────────
 async function generateImage(){
   await document.fonts.ready;
+  if (!LOGO_IMG.complete) await new Promise(r => { LOGO_IMG.onload = r; LOGO_IMG.onerror = r; });
   const sem=calcOne('semanal'), men=calcOne('mensual');
   if(!sem&&!men) return null;
 
@@ -310,7 +315,7 @@ async function generateImage(){
 
   // ── Header ──
   const grad=c.createLinearGradient(0,0,W,HDR);
-  grad.addColorStop(0,'#646d40'); grad.addColorStop(1,'#6A8A28');
+  grad.addColorStop(0,'#d6e094'); grad.addColorStop(1,'#6A8A28');
   c.fillStyle=grad;
   rr(c,0,0,W,HDR, 24,24,0,0); c.fill();
 
@@ -335,7 +340,7 @@ async function generateImage(){
   let y=HDR;
   function drawSection(items,data,freq){
     const isAmb=freq==='mensual';
-    const accent=isAmb?'#C87D20':'#646d40';
+    const accent=isAmb?'#C87D20':'#d6e094';
     const accentLight=isAmb?'#FFF3E0':'#E8F5E9';
     const fLbl=isAmb?'Mensual':'Semanal';
 
@@ -413,7 +418,7 @@ async function generateImage(){
   }
 
   // ── Footer ──
-  c.fillStyle='#646d40';
+  c.fillStyle='#d6e094';
   rr(c,0,y,W,FOOT, 0,0,24,24); c.fill();
   c.fillStyle='rgba(255,255,255,.65)';
   c.font='400 11px Inter, sans-serif';
