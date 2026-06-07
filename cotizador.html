@@ -335,23 +335,20 @@ async function generateImage(){
   c.textAlign='center';
   c.fillText(_ts,W/2,16);
 
-  // Logo izquierda: tamaño compacto como en el web header
-  const logoH=56, logoW=Math.round(logoH*(435/325));
+  // Logo izquierda
+  const logoH=80, logoW=Math.round(logoH*(435/325));
   c.drawImage(LOGO_IMG, PAD, (HDR-logoH)/2, logoW, logoH);
 
-  // Columna derecha: brand identity (igual que el web header)
+  // Columna derecha: label + plan/gramaje (sin repetir nombre de marca)
   const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
   const rX=PAD+logoW+18;
   c.textAlign='left';
-  c.fillStyle='#fff';
-  c.font='bold 18px Poppins, sans-serif';
-  c.fillText('Nutrition to Go',rX,66);
   c.fillStyle='rgba(255,255,255,.72)';
-  c.font='600 10px Poppins, sans-serif';
-  c.fillText('COTIZADOR DE PAQUETES',rX,82);
-  c.fillStyle='rgba(255,255,255,.88)';
-  c.font='500 13px Inter, sans-serif';
-  c.fillText(`${PLAN_LBL[s.plan]}  ·  ${gLbl} de proteína por platillo`,rX,102);
+  c.font='600 11px Poppins, sans-serif';
+  c.fillText('COTIZADOR DE PAQUETES',rX,66);
+  c.fillStyle='#fff';
+  c.font='500 17px Inter, sans-serif';
+  c.fillText(`${PLAN_LBL[s.plan]}  ·  ${gLbl} de proteína por platillo`,rX,90);
 
   // ── Draw one section ──
   let y=HDR;
