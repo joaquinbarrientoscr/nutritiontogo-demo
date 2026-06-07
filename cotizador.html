@@ -314,17 +314,15 @@ async function generateImage(){
   rr(c,0,0,W,H,24); c.fill();
 
   // ── Header ──
-  const grad=c.createLinearGradient(0,0,W,HDR);
-  grad.addColorStop(0,'#d6e094'); grad.addColorStop(1,'#6A8A28');
-  c.fillStyle=grad;
+  c.fillStyle='#d6e094';
   rr(c,0,0,W,HDR, 24,24,0,0); c.fill();
 
   c.textAlign='center';
-  c.fillStyle='#fff';
+  c.fillStyle='#3d4726';
   c.font='bold 30px Poppins, sans-serif';
   c.fillText('Nutrition to Go',W/2,50);
 
-  c.fillStyle='rgba(255,255,255,.72)';
+  c.fillStyle='rgba(61,71,38,.6)';
   c.font='500 13px Inter, sans-serif';
   c.fillText('Cotización de Paquete',W/2,78);
 
@@ -332,15 +330,15 @@ async function generateImage(){
   const chipTxt=`${PLAN_LBL[s.plan]}  ·  ${gLbl}`;
   c.font='600 14px Poppins, sans-serif';
   const chipW=c.measureText(chipTxt).width+32;
-  rr(c,(W-chipW)/2,93,chipW,34,17); c.fillStyle='rgba(255,255,255,.18)'; c.fill();
-  c.fillStyle='#fff';
+  rr(c,(W-chipW)/2,93,chipW,34,17); c.fillStyle='rgba(61,71,38,.12)'; c.fill();
+  c.fillStyle='#3d4726';
   c.fillText(chipTxt,W/2,115);
 
   // ── Draw one section ──
   let y=HDR;
   function drawSection(items,data,freq){
     const isAmb=freq==='mensual';
-    const accent=isAmb?'#C87D20':'#d6e094';
+    const accent=isAmb?'#C87D20':'#3d4726';
     const accentLight=isAmb?'#FFF3E0':'#E8F5E9';
     const fLbl=isAmb?'Mensual':'Semanal';
 
@@ -418,7 +416,7 @@ async function generateImage(){
   }
 
   // ── Footer ──
-  c.fillStyle='#d6e094';
+  c.fillStyle='#3d4726';
   rr(c,0,y,W,FOOT, 0,0,24,24); c.fill();
   c.fillStyle='rgba(255,255,255,.65)';
   c.font='400 11px Inter, sans-serif';
