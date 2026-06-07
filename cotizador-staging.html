@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cotizador — Nutrition to Go</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="pwa-icon.svg">
+<link rel="manifest" href="manifest-staging.json">
+<meta name="theme-color" content="#d6e094">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NTG Cotizador">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --g:#a2c037;--gd:#3d4726;--gm:#8CB340;--gl:#eef5c8;--ga:#c8d980;
+  --amb:#C87D20;--ambl:#FFF8F0;
+  --dk:#1A1A1A;--gr:#666;--bg:#F4F7F0;--wh:#fff;
+  --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
+}
+html,body{min-height:100%;background-color:var(--bg);background-image:url('ntg-bg.png');background-repeat:repeat;background-size:320px auto;font-family:var(--fb);color:var(--dk);}
+
+.app-hdr{background:#fff;padding:10px 20px;
+  display:flex;align-items:center;gap:14px;
+  position:sticky;top:0;z-index:10;
+  border-bottom:2px solid #eef5c8;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);}
+.app-hdr .hdr-logo{height:56px;width:auto;display:block;flex-shrink:0;}
+.app-hdr .sub{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gd);}
+
+.container{max-width:480px;margin:0 auto;padding:18px 14px 48px;}
+
+.card{background:var(--wh);border-radius:16px;padding:18px;
+  box-shadow:0 2px 14px rgba(74,94,31,.10);margin-bottom:12px;}
+.card-lbl{font-family:var(--fh);font-size:10.5px;font-weight:700;color:var(--g);
+  text-transform:uppercase;letter-spacing:.07em;margin-bottom:11px;
+  display:flex;align-items:center;gap:6px;}
+.card-lbl small{text-transform:none;font-weight:400;color:var(--gr);letter-spacing:0;}
+
+.pills{display:flex;flex-wrap:wrap;gap:7px;}
+.pill{border:2px solid #ddd;background:var(--wh);border-radius:24px;
+  padding:8px 15px;font-family:var(--fh);font-size:13px;font-weight:600;
+  cursor:pointer;color:#666;transition:all .14s;user-select:none;}
+.pill:hover{border-color:var(--g);color:var(--g);}
+.pill.on{background:var(--g);border-color:var(--ga);color:var(--gd);}
+
+.meals{display:flex;flex-direction:column;gap:8px;}
+.meal{display:flex;align-items:center;gap:11px;cursor:pointer;
+  padding:12px 14px;border-radius:12px;border:2px solid #eee;
+  transition:all .15s;user-select:none;}
+.meal:hover{border-color:var(--g);}
+.meal.on{border-color:var(--g);background:var(--gl);}
+.meal-emo{font-size:19px;line-height:1;flex-shrink:0;}
+.meal-lbl{flex:1;font-size:14px;font-weight:600;}
+.meal-dot{width:20px;height:20px;border-radius:50%;border:2px solid #ccc;
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;transition:all .14px;}
+.meal.on .meal-dot{background:var(--ga);border-color:var(--ga);color:var(--gd);}
+
+.spinner{display:flex;align-items:center;border:2px solid #eee;
+  border-radius:12px;overflow:hidden;width:fit-content;}
+.spinner button{width:40px;height:40px;border:none;background:none;
+  font-size:22px;cursor:pointer;color:var(--g);font-weight:700;transition:background .1s;}
+.spinner button:hover{background:var(--gl);}
+.spinner .val{min-width:44px;text-align:center;
+  font-family:var(--fh);font-size:19px;font-weight:800;}
+.prem-sub{font-size:11px;color:var(--gr);margin-top:7px;font-style:italic;}
+
+/* ── Results ── */
+.results-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+@media(max-width:360px){.results-wrap{grid-template-columns:1fr;}}
+
+.rc{border-radius:16px;padding:16px;overflow:hidden;}
+.rc.sem{background:linear-gradient(140deg,#eef7e0,#dff0d1);border:2px solid var(--ga);}
+.rc.men{background:linear-gradient(140deg,#fff5e5,#ffe8be);border:2px solid #f0c870;}
+.rc-badge{font-family:var(--fh);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px;}
+.rc.sem .rc-badge{color:var(--g);}
+.rc.men .rc-badge{color:var(--amb);}
+.rc-lines{font-size:11.5px;color:var(--gr);line-height:1.75;margin-bottom:9px;}
+.rc-lines .disc{color:#2e5c1a;font-weight:700;}
+.rc-lines .prem{color:var(--amb);font-weight:700;}
+.rc-sep{height:1px;margin:9px 0;}
+.rc.sem .rc-sep{background:rgba(74,94,31,.18);}
+.rc.men .rc-sep{background:rgba(200,125,32,.2);}
+.rc-total{font-family:var(--fh);font-size:22px;font-weight:800;line-height:1;}
+.rc.sem .rc-total{color:var(--g);}
+.rc.men .rc-total{color:var(--amb);}
+.rc-sub{font-size:9.5px;color:var(--gr);margin-top:3px;margin-bottom:12px;}
+
+.share-img-btn{
+  width:100%;padding:9px 8px;border:none;border-radius:10px;
+  font-family:var(--fh);font-size:12px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  transition:opacity .14s;}
+.share-img-btn:hover{opacity:.88;}
+.share-img-btn.loading{opacity:.6;pointer-events:none;}
+.main-share{background:var(--g);color:var(--gd);border-radius:14px;
+  font-size:14px;box-shadow:0 3px 14px rgba(100,109,64,.25);}
+
+.res-empty{background:var(--wh);border-radius:16px;padding:26px 16px;
+  text-align:center;color:var(--gr);font-size:14px;
+  border:2px dashed #ddd;grid-column:1/-1;}
+
+.disc-badge{display:inline-block;background:#dff0d1;color:var(--g);
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;
+  border:1px solid var(--ga);margin-left:5px;}
+
+.footer{text-align:center;font-size:11px;color:var(--gr);padding:4px 0;line-height:1.6;}
+.footer a{color:var(--g);text-decoration:none;font-weight:600;}
+
+.install-bar{display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--g);color:var(--gd);padding:13px 18px;
+  align-items:center;gap:10px;z-index:50;
+  box-shadow:0 -3px 16px rgba(0,0,0,.2);}
+.install-bar.show{display:flex;}
+.install-bar p{flex:1;font-size:12.5px;font-weight:500;}
+.ibtn{background:var(--gd);color:#fff;border:none;border-radius:20px;
+  padding:7px 16px;font-family:var(--fh);font-size:12px;font-weight:700;cursor:pointer;}
+.idis{background:none;border:none;color:#fff;opacity:.6;font-size:22px;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="app-hdr">
+  <img src="ntg-logo.png" class="hdr-logo" alt="Nutrition to Go">
+  <span class="sub">Cotizador de Paquetes</span>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <div class="card-lbl">Tipo de plan</div>
+    <div class="pills" id="planPills">
+      <div class="pill on" onclick="setPlan('estandar',this)">Estándar</div>
+      <div class="pill"    onclick="setPlan('keto',this)">🥑 Keto</div>
+      <div class="pill"    onclick="setPlan('vegetariano',this)">🌿 Vegetariano</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">Gramaje de proteína</div>
+    <div class="pills" id="gramPills"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">
+      Tiempos de comida
+      <span class="disc-badge" id="discBadge" style="display:none">−₡2,000 c/tiempo extra</span>
+    </div>
+    <div class="meals">
+      <div class="meal on" id="mAlm" onclick="togMeal('alm',this)">
+        <span class="meal-emo">🍽️</span><span class="meal-lbl">Almuerzos</span>
+        <span class="meal-dot">✓</span>
+      </div>
+      <div class="meal" id="mCen" onclick="togMeal('cen',this)">
+        <span class="meal-emo">🌙</span><span class="meal-lbl">Cenas</span>
+        <span class="meal-dot"></span>
+      </div>
+      <div class="meal" id="mDes" onclick="togMeal('des',this)">
+        <span class="meal-emo">🍳</span><span class="meal-lbl">Desayunos</span>
+        <span class="meal-dot"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="premCard">
+    <div class="card-lbl">Platillos premium <small>Salmón · Camarones · Atún</small></div>
+    <div class="spinner">
+      <button onclick="chgPrem(-1)">−</button>
+      <span class="val" id="premVal">0</span>
+      <button onclick="chgPrem(+1)">+</button>
+    </div>
+    <div class="prem-sub" id="premSub"></div>
+  </div>
+
+  <div class="results-wrap" id="results"></div>
+
+  <div class="footer"><a href="index.html">Ver menú y hacer pedido →</a></div>
+</div>
+
+<div class="install-bar" id="installBar">
+  <p><strong>Instalá la app</strong> para usar sin conexión</p>
+  <button class="ibtn" id="installBtn">Instalar</button>
+  <button class="idis" onclick="document.getElementById('installBar').classList.remove('show')">×</button>
+</div>
+
+<script>
+const PR={
+  estandar:{
+    semanal:{c:{120:4200,150:5000,180:5500,210:6000},d:{120:3500,150:4000,180:4500,210:5000},p:1500,e:4000,q:5},
+    mensual: {c:{120:3850,150:4500,180:5000,210:5500},d:{120:3200,150:3700,180:4200,210:4700},p:1000,e:16000,q:20}
+  },
+  keto:{
+    semanal:{c:{150:5000,180:5500,210:6000},d:{150:4000,180:4500,210:5000},p:1500,e:4000,q:5},
+    mensual: {c:{150:4500,180:5000,210:5500},d:{150:3700,180:4200,210:4700},p:1000,e:16000,q:20}
+  },
+  vegetariano:{
+    semanal:{c:{lte:4200,gt:5000},d:{lte:3500,gt:4000},p:null,e:4000,q:5},
+    mensual: {c:{lte:3850,gt:4500},d:{lte:3200,gt:3700},p:null,e:16000,q:20}
+  }
+};
+const GRAM_OPTS={estandar:[120,150,180,210],keto:[150,180,210],vegetariano:['lte','gt']};
+const GRAM_LBL={lte:'≤ 120g',gt:'+ 120g'};
+const PLAN_LBL={estandar:'Estándar',keto:'Keto',vegetariano:'Vegetariano'};
+let s={plan:'estandar',gram:120,prem:0,alm:true,cen:false,des:false};
+const fmt=n=>'₡'+n.toLocaleString('es-CR');
+
+function setPlan(p,el){
+  s.plan=p;s.prem=0;s.gram=GRAM_OPTS[p][0];
+  document.getElementById('premVal').textContent=0;
+  document.querySelectorAll('#planPills .pill').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('premCard').style.display=p==='vegetariano'?'none':'block';
+  renderGram();calc();
+}
+function setGram(g,el){
+  s.gram=g;
+  document.querySelectorAll('#gramPills .pill').forEach(b=>b.classList.remove('on'));
+  el.classList.add('on');calc();
+}
+function togMeal(t,el){
+  s[t]=!s[t];
+  el.classList.toggle('on',s[t]);
+  el.querySelector('.meal-dot').textContent=s[t]?'✓':'';
+  const pr=PR[s.plan].semanal;
+  s.prem=Math.min(s.prem,(s.alm?pr.q:0)+(s.cen?pr.q:0));
+  document.getElementById('premVal').textContent=s.prem;
+  calc();
+}
+function chgPrem(d){
+  const pr=PR[s.plan].semanal;
+  const max=(s.alm?pr.q:0)+(s.cen?pr.q:0);
+  s.prem=Math.max(0,Math.min(max,s.prem+d));
+  document.getElementById('premVal').textContent=s.prem;calc();
+}
+function renderGram(){
+  document.getElementById('gramPills').innerHTML=GRAM_OPTS[s.plan].map(g=>{
+    const lbl=GRAM_LBL[g]||(g+'g');
+    return`<div class="pill ${g===s.gram?'on':''}" onclick="setGram(${JSON.stringify(g)},this)">${lbl}</div>`;
+  }).join('');
+}
+function calcOne(freq){
+  const pr=PR[s.plan][freq],g=s.gram;
+  const checked=[s.alm,s.cen,s.des].filter(Boolean).length;
+  if(!checked)return null;
+  const pAlm=pr.c[g]||0,pDes=pr.d[g]||0,q=pr.q;
+  const qAC=(s.alm?q:0)+(s.cen?q:0);
+  const subAC=qAC*pAlm,subDes=s.des?q*pDes:0;
+  const disc=(checked-1)*2000,premSur=pr.p?s.prem*pr.p:0;
+  return{pr,q,qAC,subAC,subDes,disc,premSur,total:subAC+subDes-disc+premSur+pr.e,checked};
+}
+
+// ── Canvas helpers ────────────────────────────────────────────────────────────
+function rr(ctx,x,y,w,h,tl,tr,br,bl){
+  if(tr===undefined)tr=tl; if(br===undefined)br=tl; if(bl===undefined)bl=tl;
+  ctx.beginPath();
+  ctx.moveTo(x+tl,y);
+  ctx.lineTo(x+w-tr,y); ctx.arcTo(x+w,y,x+w,y+tr,tr);
+  ctx.lineTo(x+w,y+h-br); ctx.arcTo(x+w,y+h,x+w-br,y+h,br);
+  ctx.lineTo(x+bl,y+h); ctx.arcTo(x,y+h,x,y+h-bl,bl);
+  ctx.lineTo(x,y+tl); ctx.arcTo(x,y,x+tl,y,tl);
+  ctx.closePath();
+}
+
+// ── Logo preload ──────────────────────────────────────────────────────────────
+const LOGO_IMG = new Image();
+LOGO_IMG.src = 'ntg-logo.png';
+
+// ── Combined image (semanal + mensual) ───────────────────────────────────────
+async function generateImage(){
+  await document.fonts.ready;
+  if (!LOGO_IMG.complete) await new Promise(r => { LOGO_IMG.onload = r; LOGO_IMG.onerror = r; });
+  const sem=calcOne('semanal'), men=calcOne('mensual');
+  if(!sem&&!men) return null;
+
+  const hasPrem = s.plan!=='vegetariano';
+  const DPR=2, W=600, PAD=44;
+  const HDR=148, ITEM_H=52, TOTAL_H=60, SEC_PAD=24, DIVIDER=20;
+  const PREM_H = hasPrem ? 84 : 0;
+  const FOOT=90;
+
+  function buildItems(data){
+    const{pr,q,qAC,subAC,subDes,disc,premSur,checked}=data;
+    const it=[];
+    if(s.alm||s.cen){
+      const lbl=[s.alm&&'Almuerzos',s.cen&&'Cenas'].filter(Boolean).join(' + ');
+      it.push({l:`${qAC} platillos · ${lbl}`,v:fmt(subAC),t:'normal'});
+    }
+    if(s.des) it.push({l:`${q} platillos · Desayunos`,v:fmt(subDes),t:'normal'});
+    if(disc>0){const n=checked-1; it.push({l:`Descuento ${n} tiempo${n>1?'s':''} adicional${n>1?'es':''}`,v:`−${fmt(disc)}`,t:'disc'});}
+    if(premSur>0) it.push({l:`${s.prem} platillo${s.prem>1?'s':''} premium (+${fmt(data.pr.p)} c/u)`,v:`+${fmt(premSur)}`,t:'prem'});
+    it.push({l:'Envío',v:`+${fmt(pr.e)}`,t:'envio'});
+    return it;
+  }
+
+  const semIt=sem?buildItems(sem):[];
+  const menIt=men?buildItems(men):[];
+  const secH=(items)=>{
+    const steps=items.reduce((s,it)=>s+(it.t==='envio'?22:ITEM_H),0);
+    return SEC_PAD+50+steps+2+TOTAL_H+SEC_PAD;
+  };
+  const semH=secH(semIt,sem), menH=secH(menIt,men);
+  const H=HDR+semH+DIVIDER+menH+(hasPrem?PREM_H+16:0)+FOOT;
+
+  const cv=document.createElement('canvas');
+  cv.width=W*DPR; cv.height=H*DPR;
+  const c=cv.getContext('2d');
+  c.scale(DPR,DPR);
+
+  // ── Outer card background ──
+  c.fillStyle='#F7FAF2';
+  rr(c,0,0,W,H,24); c.fill();
+
+  // ── Header — fondo blanco ──
+  c.fillStyle='#fff';
+  rr(c,0,0,W,HDR, 24,24,0,0); c.fill();
+  // borde inferior sutil
+  c.strokeStyle='#e8f0c8';
+  c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(0,HDR); c.lineTo(W,HDR); c.stroke();
+
+  // Timestamp
+  const _now=new Date();
+  const _cr=new Date(_now.getTime()+(_now.getTimezoneOffset()+(-6*60))*60000);
+  const _MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const _h=_cr.getHours(),_mi=_cr.getMinutes().toString().padStart(2,'0');
+  const _ts=`Cotización generada: ${_cr.getDate()} de ${_MESES[_cr.getMonth()]} de ${_cr.getFullYear()} a las ${(_h%12)||12}:${_mi} ${_h>=12?'PM':'AM'} UTC-6`;
+  c.fillStyle='rgba(0,0,0,.38)';
+  c.font='400 12px Inter, sans-serif';
+  c.textAlign='center';
+  c.fillText(_ts,W/2,16);
+
+  // Logo izquierda (cuadrado 1:1)
+  const logoH=96, logoW=96;
+  c.drawImage(LOGO_IMG, PAD, (HDR-logoH)/2, logoW, logoH);
+
+  // Columna derecha: label + plan/gramaje
+  const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
+  const rX=PAD+logoW+18;
+  c.textAlign='left';
+  c.fillStyle='#a2c037';
+  c.font='700 13px Poppins, sans-serif';
+  c.fillText('COTIZACIÓN DE PAQUETES',rX,66);
+  c.fillStyle='#3d4726';
+  c.font='500 17px Inter, sans-serif';
+  c.fillText(`${PLAN_LBL[s.plan]}  ·  ${gLbl} de proteína por platillo`,rX,90);
+
+  // ── Draw one section ──
+  let y=HDR;
+  function drawSection(items,data,freq){
+    const isAmb=freq==='mensual';
+    const accent=isAmb?'#C87D20':'#3d4726';
+    const accentLight=isAmb?'#FFF3E0':'#E8F5E9';
+    const fLbl=isAmb?'Mensual':'Semanal';
+
+    y+=SEC_PAD;
+
+    c.font='700 17px Poppins, sans-serif';
+    c.textAlign='left';
+    c.fillStyle=accent;
+    c.fillText(fLbl.toUpperCase(),PAD,y+16);
+    c.fillStyle=isAmb?'rgba(200,125,32,.3)':'rgba(74,94,31,.2)';
+    c.fillRect(PAD,y+20,W-PAD*2,1);
+    y+=50;
+
+    items.forEach(item=>{
+      const isDisc=item.t==='disc',isPrem=item.t==='prem',isEnvio=item.t==='envio';
+      c.fillStyle=isDisc?'#2e5c1a':isPrem?'#C87D20':isEnvio?'#999':'#1A1A1A';
+      c.font=(isDisc||isPrem)?'700 16px Inter, sans-serif':'500 16px Inter, sans-serif';
+      c.textAlign='left'; c.fillText(item.l,PAD,y);
+      c.textAlign='right'; c.fillText(item.v,W-PAD,y);
+      c.fillStyle='rgba(0,0,0,.045)'; c.fillRect(PAD,y+8,W-PAD*2,1);
+      y+=isEnvio?22:ITEM_H;
+    });
+
+    y+=2;
+
+    c.fillStyle=accentLight;
+    rr(c,PAD-4,y,W-PAD*2+8,TOTAL_H,12); c.fill();
+    c.fillStyle=accent;
+    c.font='700 14px Poppins, sans-serif';
+    c.textAlign='left';
+    c.fillText('TOTAL ESTIMADO',PAD+12,y+22);
+    c.fillStyle=isAmb?'rgba(200,125,32,.78)':'rgba(61,71,38,.72)';
+    c.font='500 12px Inter, sans-serif';
+    c.fillText('Incluye envío',PAD+12,y+38);
+    c.fillStyle=accent;
+    c.font='bold 32px Poppins, sans-serif';
+    c.textAlign='right';
+    c.fillText(fmt(data.total),W-PAD-16,y+44);
+
+    y+=TOTAL_H+SEC_PAD;
+  }
+
+  drawSection(semIt,sem,'semanal');
+
+  c.fillStyle='rgba(74,94,31,.1)';
+  c.fillRect(PAD,y,W-PAD*2,2);
+  y+=DIVIDER;
+
+  drawSection(menIt,men,'mensual');
+
+  if(hasPrem){
+    const sp=PR[s.plan].semanal, mp=PR[s.plan].mensual;
+    y+=4;
+    c.fillStyle='#FFF8F0';
+    rr(c,PAD-4,y,W-PAD*2+8,PREM_H,12); c.fill();
+    c.strokeStyle='rgba(200,125,32,.28)'; c.lineWidth=1.5;
+    rr(c,PAD-4,y,W-PAD*2+8,PREM_H,12); c.stroke();
+    c.fillStyle='#C87D20';
+    c.font='700 14px Poppins, sans-serif';
+    c.textAlign='left';
+    c.fillText('⭐  Proteínas premium',PAD+12,y+24);
+    c.fillStyle='#555';
+    c.font='500 14px Inter, sans-serif';
+    c.fillText('Salmón · Camarones · Atún',PAD+12,y+44);
+    c.fillStyle='#777';
+    c.font='400 13px Inter, sans-serif';
+    c.fillText(`+${fmt(sp.p)} por platillo en paquete semanal  ·  +${fmt(mp.p)} en mensual`,PAD+12,y+64);
+    y+=PREM_H+16;
+  }
+
+  // ── Footer ──
+  c.fillStyle='#3d4726';
+  rr(c,0,y,W,FOOT, 0,0,24,24); c.fill();
+  c.fillStyle='rgba(255,255,255,.65)';
+  c.font='400 13px Inter, sans-serif';
+  c.textAlign='center';
+  c.fillText('Precio estimado · puede variar según selección final de platillos',W/2,y+32);
+  c.fillStyle='#fff';
+  c.font='700 15px Poppins, sans-serif';
+  c.fillText('Contáctenos  ·  8729-5097 | 8897-3740',W/2,y+58);
+
+  return cv;
+}
+
+async function shareImage(btn){
+  btn.classList.add('loading');
+  btn.textContent='Generando…';
+  try{
+    const cv=await generateImage();
+    if(!cv){btn.classList.remove('loading');renderCards();return;}
+    cv.toBlob(async blob=>{
+      const file=new File([blob],'cotizacion-ntg.png',{type:'image/png'});
+      try{
+        if(navigator.canShare&&navigator.canShare({files:[file]})){
+          await navigator.share({title:'Cotización Nutrition to Go',files:[file]});
+        } else {
+          const url=URL.createObjectURL(blob);
+          const a=document.createElement('a');
+          a.href=url; a.download='cotizacion-ntg.png'; a.click();
+          setTimeout(()=>URL.revokeObjectURL(url),1000);
+        }
+      }catch(e){if(e.name!=='AbortError')console.warn(e);}
+      btn.classList.remove('loading');renderCards();
+    },'image/png',0.95);
+  }catch(e){console.warn(e);btn.classList.remove('loading');renderCards();}
+}
+
+function buildCard(freq,data,cls){
+  const{pr,q,qAC,subAC,subDes,disc,premSur,total,checked}=data;
+  const badge=freq==='semanal'?'Semanal × 5':'Mensual × 20';
+  let lines='';
+  if(s.alm||s.cen){
+    const lbl=[s.alm&&'Almuerzos',s.cen&&'Cenas'].filter(Boolean).join('+');
+    lines+=`<div>${qAC} platillos (${lbl}) — ${fmt(subAC)}</div>`;
+  }
+  if(s.des) lines+=`<div>${q} platillos (Desayunos) — ${fmt(subDes)}</div>`;
+  if(disc>0){const n=checked-1;lines+=`<div class="disc">Descuento ${n} tiempo${n>1?'s':''} — −${fmt(disc)}</div>`;}
+  if(premSur>0) lines+=`<div class="prem">${s.prem} premium — +${fmt(premSur)}</div>`;
+  lines+=`<div>Envío — +${fmt(pr.e)}</div>`;
+  const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
+  return`<div class="rc ${cls}">
+    <div class="rc-badge">${badge} · ${PLAN_LBL[s.plan]} · ${gLbl}</div>
+    <div class="rc-lines">${lines}</div>
+    <div class="rc-sep"></div>
+    <div class="rc-total">${fmt(total)}</div>
+    <div class="rc-sub">Total estimado (envío incluido)</div>
+  </div>`;
+}
+
+function renderCards(){
+  const checked=[s.alm,s.cen,s.des].filter(Boolean).length;
+  document.getElementById('discBadge').style.display=checked>1?'inline-block':'none';
+  const semPr=PR[s.plan].semanal;
+  document.getElementById('premSub').textContent=
+    semPr.p?`+${fmt(semPr.p)}/platillo semanal · +${fmt(PR[s.plan].mensual.p)}/platillo mensual`:'';
+  const el=document.getElementById('results');
+  if(!checked){el.innerHTML='<div class="res-empty">📋 Seleccioná al menos un tiempo de comida</div>';return;}
+  const sem=calcOne('semanal'),men=calcOne('mensual');
+  el.innerHTML=
+    buildCard('semanal',sem,'sem')+
+    buildCard('mensual',men,'men')+
+    `<button class="share-img-btn main-share" style="grid-column:1/-1;margin-top:2px;padding:13px;" onclick="shareImage(this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18 16c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.4.1-.6s0-.4-.1-.6L16 7.2c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .4.1.6L8 9.8C7.5 9.3 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.3 2-.8l7.1 4.2c0 .2-.1.4-.1.5 0 1.6 1.3 2.9 2.9 2.9S21 20.6 21 19s-1.3-3-3-3z"/>
+      </svg>
+      Generar imagen para compartir
+    </button>`;
+}
+const calc=renderCards;
+
+renderGram();calc();
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  document.getElementById('installBar').classList.add('show');
+});
+document.getElementById('installBtn').addEventListener('click',async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  document.getElementById('installBar').classList.remove('show');
+});
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw-staging.js').catch(()=>{});
+</script>
+</body>
+</html>
