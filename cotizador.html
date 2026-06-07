@@ -279,7 +279,7 @@ async function generateImage(){
 
   const hasPrem = s.plan!=='vegetariano';
   const DPR=2, W=600, PAD=44;
-  const HDR=168, ITEM_H=48, TOTAL_H=70, SEC_PAD=24, DIVIDER=20;
+  const HDR=148, ITEM_H=48, TOTAL_H=62, SEC_PAD=24, DIVIDER=20;
   const PREM_H = hasPrem ? 84 : 0;
   const FOOT=90;
 
@@ -323,15 +323,15 @@ async function generateImage(){
   // Columna derecha: etiqueta + plan + gramaje
   const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
   c.textAlign='right';
-  c.fillStyle='rgba(255,255,255,.7)';
-  c.font='600 11px Poppins, sans-serif';
-  c.fillText('COTIZACIÓN DE PAQUETE',W-PAD,62);
+  c.fillStyle='rgba(255,255,255,.95)';
+  c.font='600 12px Poppins, sans-serif';
+  c.fillText('COTIZACIÓN DE PAQUETE',W-PAD,50);
   c.fillStyle='#fff';
-  c.font='bold 20px Poppins, sans-serif';
-  c.fillText(PLAN_LBL[s.plan],W-PAD,88);
-  c.fillStyle='rgba(255,255,255,.85)';
-  c.font='500 14px Inter, sans-serif';
-  c.fillText(gLbl,W-PAD,108);
+  c.font='bold 22px Poppins, sans-serif';
+  c.fillText(PLAN_LBL[s.plan],W-PAD,76);
+  c.fillStyle='rgba(255,255,255,.92)';
+  c.font='500 15px Inter, sans-serif';
+  c.fillText(`${gLbl} de proteína por platillo`,W-PAD,98);
 
   // ── Draw one section ──
   let y=HDR;
@@ -350,8 +350,8 @@ async function generateImage(){
     c.fillText(fLbl.toUpperCase(),PAD,y+16);
     // underline
     c.fillStyle=isAmb?'rgba(200,125,32,.3)':'rgba(74,94,31,.2)';
-    c.fillRect(PAD,y+18,W-PAD*2,1);
-    y+=36;
+    c.fillRect(PAD,y+20,W-PAD*2,1);
+    y+=44;
 
     // Items
     items.forEach(item=>{
@@ -361,7 +361,7 @@ async function generateImage(){
       c.textAlign='left'; c.fillText(item.l,PAD,y);
       c.textAlign='right'; c.fillText(item.v,W-PAD,y);
       c.fillStyle='rgba(0,0,0,.045)'; c.fillRect(PAD,y+8,W-PAD*2,1);
-      y+=ITEM_H;
+      y+=isEnvio?36:ITEM_H;
     });
 
     y+=2;
@@ -369,19 +369,19 @@ async function generateImage(){
     // Total block
     c.fillStyle=accentLight;
     rr(c,PAD-4,y,W-PAD*2+8,TOTAL_H,12); c.fill();
-    // Lado izquierdo: label + "Incluye envío" apilados
+    // Izquierda: label arriba, "Incluye envío" abajo — alineados con precio
     c.fillStyle=accent;
     c.font='700 13px Poppins, sans-serif';
     c.textAlign='left';
-    c.fillText('TOTAL ESTIMADO',PAD+12,y+20);
+    c.fillText('TOTAL ESTIMADO',PAD+12,y+17);
     c.fillStyle='rgba(0,0,0,.4)';
     c.font='400 11px Inter, sans-serif';
-    c.fillText('Incluye envío',PAD+12,y+36);
-    // Lado derecho: precio grande
+    c.fillText('Incluye envío',PAD+12,y+31);
+    // Derecha: precio alineado verticalmente al centro del bloque
     c.fillStyle=accent;
     c.font='bold 34px Poppins, sans-serif';
     c.textAlign='right';
-    c.fillText(fmt(data.total),W-PAD+4,y+56);
+    c.fillText(fmt(data.total),W-PAD+4,y+50);
 
     y+=TOTAL_H+SEC_PAD;
   }
