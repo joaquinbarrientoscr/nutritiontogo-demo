@@ -4,21 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cotizador — Nutrition to Go</title>
+  <link rel="icon" type="image/svg+xml" href="ntg-logo2-dark.svg">
+  <link rel="apple-touch-icon" href="ntg-logo2-dark.svg">
 <link rel="manifest" href="manifest-cotiz.json">
 <meta name="theme-color" content="#d6e094">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NTG Cotizador">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --g:#d6e094;--gd:#3d4726;--gm:#8CB340;--gl:#eef5c8;--ga:#c8d980;
+  --g:#a2c037;--gd:#3d4726;--gm:#8CB340;--gl:#eef5c8;--ga:#c8d980;
   --amb:#C87D20;--ambl:#FFF8F0;
   --dk:#1A1A1A;--gr:#666;--bg:#F4F7F0;--wh:#fff;
   --fh:'Poppins',sans-serif;--fb:'Inter',sans-serif;
@@ -28,8 +27,8 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(-
 .app-hdr{background:var(--g);color:var(--gd);padding:18px 20px 16px;
   text-align:center;position:sticky;top:0;z-index:10;
   box-shadow:0 2px 14px rgba(0,0,0,.2);}
-.app-hdr .logo{font-family:var(--fh);font-size:19px;font-weight:800;}
-.app-hdr .logo em{color:var(--gd);font-style:normal;opacity:.6;}
+.app-hdr .hdr-logo{height:44px;width:auto;display:block;margin:0 auto;}
+
 .app-hdr .sub{font-size:11px;opacity:.75;margin-top:2px;}
 
 .container{max-width:480px;margin:0 auto;padding:18px 14px 48px;}
@@ -126,7 +125,7 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(-
 </head>
 <body>
 <div class="app-hdr">
-  <div class="logo">Nutrition <em>to Go</em></div>
+  <img src="ntg-logo-dark.svg" class="hdr-logo" alt="NTG">
   <div class="sub">Cotizador de paquetes</div>
 </div>
 
