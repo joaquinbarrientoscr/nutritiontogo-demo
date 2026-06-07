@@ -268,7 +268,7 @@ function rr(ctx,x,y,w,h,tl,tr,br,bl){
 
 // ── Logo preload ──────────────────────────────────────────────────────────────
 const LOGO_IMG = new Image();
-LOGO_IMG.src = 'icon-512-light.png';
+LOGO_IMG.src = 'ntg-logo2-dark.svg';
 
 // ── Combined image (semanal + mensual) ───────────────────────────────────────
 async function generateImage(){
@@ -279,7 +279,7 @@ async function generateImage(){
 
   const hasPrem = s.plan!=='vegetariano';
   const DPR=2, W=600, PAD=44;
-  const HDR=148, ITEM_H=60, TOTAL_H=92, SEC_PAD=28, DIVIDER=20;
+  const HDR=168, ITEM_H=48, TOTAL_H=80, SEC_PAD=24, DIVIDER=20;
   const PREM_H = hasPrem ? 84 : 0;
   const FOOT=72;
 
@@ -313,25 +313,27 @@ async function generateImage(){
   rr(c,0,0,W,H,24); c.fill();
 
   // ── Header ──
-  c.fillStyle='#d6e094';
+  c.fillStyle='#a2c037';
   rr(c,0,0,W,HDR, 24,24,0,0); c.fill();
 
+  // Logo: ntg-logo2-dark (viewBox 435×325, aspect ≈1.338) — green rect blends with header
+  const logoH=72, logoW=Math.round(logoH*(435/325));
+  c.drawImage(LOGO_IMG,(W-logoW)/2,14,logoW,logoH);
+
+  // Subtitle
   c.textAlign='center';
-  c.fillStyle='#3d4726';
-  c.font='bold 30px Poppins, sans-serif';
-  c.fillText('Nutrition to Go',W/2,50);
-
-  c.fillStyle='rgba(61,71,38,.6)';
+  c.fillStyle='rgba(255,255,255,.85)';
   c.font='500 13px Inter, sans-serif';
-  c.fillText('Cotización de Paquete',W/2,78);
+  c.fillText('Cotización de Paquete',W/2,104);
 
+  // Plan chip
   const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
   const chipTxt=`${PLAN_LBL[s.plan]}  ·  ${gLbl}`;
-  c.font='600 14px Poppins, sans-serif';
+  c.font='600 13px Poppins, sans-serif';
   const chipW=c.measureText(chipTxt).width+32;
-  rr(c,(W-chipW)/2,93,chipW,34,17); c.fillStyle='rgba(61,71,38,.12)'; c.fill();
-  c.fillStyle='#3d4726';
-  c.fillText(chipTxt,W/2,115);
+  rr(c,(W-chipW)/2,116,chipW,32,16); c.fillStyle='rgba(0,0,0,.18)'; c.fill();
+  c.fillStyle='#fff';
+  c.fillText(chipTxt,W/2,136);
 
   // ── Draw one section ──
   let y=HDR;
@@ -351,16 +353,16 @@ async function generateImage(){
     // underline
     c.fillStyle=isAmb?'rgba(200,125,32,.3)':'rgba(74,94,31,.2)';
     c.fillRect(PAD,y+18,W-PAD*2,1);
-    y+=42;
+    y+=36;
 
     // Items
     items.forEach(item=>{
       const isDisc=item.t==='disc',isPrem=item.t==='prem',isEnvio=item.t==='envio';
       c.fillStyle=isDisc?'#2e5c1a':isPrem?'#C87D20':isEnvio?'#999':'#1A1A1A';
-      c.font=(isDisc||isPrem)?'700 18px Inter, sans-serif':'500 18px Inter, sans-serif';
+      c.font=(isDisc||isPrem)?'700 14px Inter, sans-serif':'500 14px Inter, sans-serif';
       c.textAlign='left'; c.fillText(item.l,PAD,y);
       c.textAlign='right'; c.fillText(item.v,W-PAD,y);
-      c.fillStyle='rgba(0,0,0,.045)'; c.fillRect(PAD,y+9,W-PAD*2,1);
+      c.fillStyle='rgba(0,0,0,.045)'; c.fillRect(PAD,y+8,W-PAD*2,1);
       y+=ITEM_H;
     });
 
@@ -370,16 +372,16 @@ async function generateImage(){
     c.fillStyle=accentLight;
     rr(c,PAD-4,y,W-PAD*2+8,TOTAL_H,12); c.fill();
     c.fillStyle=accent;
-    c.font='700 11px Poppins, sans-serif';
+    c.font='700 13px Poppins, sans-serif';
     c.textAlign='left';
-    c.fillText('TOTAL ESTIMADO',PAD+12,y+22);
-    c.font='bold 42px Poppins, sans-serif';
+    c.fillText('TOTAL ESTIMADO',PAD+12,y+20);
+    c.font='bold 34px Poppins, sans-serif';
     c.textAlign='right';
-    c.fillText(fmt(data.total),W-PAD+4,y+68);
+    c.fillText(fmt(data.total),W-PAD+4,y+58);
     c.fillStyle='#999';
-    c.font='400 10.5px Inter, sans-serif';
+    c.font='400 11px Inter, sans-serif';
     c.textAlign='left';
-    c.fillText('Incluye envío',PAD+12,y+82);
+    c.fillText('Incluye envío',PAD+12,y+72);
 
     y+=TOTAL_H+SEC_PAD;
   }

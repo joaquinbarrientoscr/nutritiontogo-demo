@@ -1,10 +1,11 @@
-const CACHE = 'ntg-cotiz-v5';
+const CACHE = 'ntg-cotiz-v6';
 const ASSETS = [
   '/nutritiontogo-demo/cotizador.html',
   '/nutritiontogo-demo/manifest-cotiz.json',
   '/nutritiontogo-demo/ntg-logo2-dark.svg',
   '/nutritiontogo-demo/ntg-logo-dark.svg',
   '/nutritiontogo-demo/ntg-wordmark-light.svg',
+  '/nutritiontogo-demo/favicon.svg',
 ];
 
 self.addEventListener('install', e => {
