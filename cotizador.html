@@ -319,6 +319,17 @@ async function generateImage(){
   c.fillStyle='#a2c037';
   rr(c,0,0,W,HDR, 24,24,0,0); c.fill();
 
+  // Timestamp — apenas perceptible, borde superior del header
+  const _now=new Date();
+  const _cr=new Date(_now.getTime()+(_now.getTimezoneOffset()+(-6*60))*60000);
+  const _MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const _h=_cr.getHours(),_mi=_cr.getMinutes().toString().padStart(2,'0');
+  const _ts=`Cotización generada: ${_cr.getDate()} de ${_MESES[_cr.getMonth()]} de ${_cr.getFullYear()} a las ${(_h%12)||12}:${_mi} ${_h>=12?'PM':'AM'} UTC-6`;
+  c.fillStyle='rgba(255,255,255,.42)';
+  c.font='400 10px Inter, sans-serif';
+  c.textAlign='center';
+  c.fillText(_ts,W/2,15);
+
   // Logo izquierda: ntg-logo2-dark (viewBox 435×325, aspect ≈1.338)
   const logoH=90, logoW=Math.round(logoH*(435/325));
   c.drawImage(LOGO_IMG, PAD, (HDR-logoH)/2, logoW, logoH);
