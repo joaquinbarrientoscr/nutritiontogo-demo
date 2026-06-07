@@ -24,17 +24,14 @@
 }
 html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(--dk);}
 
-.app-hdr{background:var(--g);color:var(--gd);padding:4px 20px;
-  text-align:center;position:sticky;top:0;z-index:10;
+.app-hdr{background:var(--g);color:var(--gd);padding:10px 20px;
+  display:flex;align-items:center;gap:14px;
+  position:sticky;top:0;z-index:10;
   box-shadow:0 2px 14px rgba(0,0,0,.2);}
-.app-hdr .hdr-logo{height:70px;width:auto;display:block;margin:0 auto;}
-
-.app-hdr .sub{
-  display:inline-block;
-  font-size:10px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
-  color:#fff;background:rgba(0,0,0,.2);
-  padding:3px 12px;border-radius:20px;margin-top:5px;
-}
+.app-hdr .hdr-logo{height:48px;width:auto;display:block;flex-shrink:0;}
+.app-hdr .hdr-text{display:flex;flex-direction:column;gap:3px;}
+.app-hdr .hdr-title{font-size:17px;font-weight:700;color:#fff;line-height:1;}
+.app-hdr .sub{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.72);}
 
 .container{max-width:480px;margin:0 auto;padding:18px 14px 48px;}
 
@@ -131,7 +128,10 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--fb);color:var(-
 <body>
 <div class="app-hdr">
   <img src="ntg-logo2-dark.svg" class="hdr-logo" alt="NTG">
-  <div class="sub">Cotizador de paquetes</div>
+  <div class="hdr-text">
+    <span class="hdr-title">Nutrition to Go</span>
+    <span class="sub">Cotizador de paquetes</span>
+  </div>
 </div>
 
 <div class="container">
