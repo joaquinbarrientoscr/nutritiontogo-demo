@@ -10,6 +10,6 @@
   "theme_color": "#a2c037",
   "lang": "es",
   "icons": [
-    { "src": "pwa-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "pwa-icon-staging.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }

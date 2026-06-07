@@ -1,10 +1,10 @@
-const CACHE = 'ntg-staging-v1';
+const CACHE = 'ntg-staging-v2';
 const ASSETS = [
   '/nutritiontogo-demo/cotizador-staging.html',
   '/nutritiontogo-demo/manifest-staging.json',
   '/nutritiontogo-demo/ntg-logo.png',
-  '/nutritiontogo-demo/favicon.svg',
-  '/nutritiontogo-demo/pwa-icon.svg',
+  '/nutritiontogo-demo/favicon-staging.svg',
+  '/nutritiontogo-demo/pwa-icon-staging.png',
   '/nutritiontogo-demo/ntg-bg.png',
 ];
 
