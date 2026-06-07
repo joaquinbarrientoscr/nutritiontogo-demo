@@ -1,6 +1,6 @@
-const CACHE = 'ntg-cotiz-v23';
+const CACHE = 'ntg-cotiz-v24';
 const ASSETS = [
-  '/nutritiontogo-demo/cotizador-original.html',
+  '/nutritiontogo-demo/cotizador.html',
   '/nutritiontogo-demo/manifest-cotiz.json',
   '/nutritiontogo-demo/ntg-logo2-dark.svg',
   '/nutritiontogo-demo/ntg-logo-dark.svg',

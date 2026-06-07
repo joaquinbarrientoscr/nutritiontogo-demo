@@ -2,7 +2,7 @@
   "name": "Cotizador Staging — Nutrition to Go",
   "short_name": "NTG Staging",
   "description": "Calculá el costo de tu paquete semanal o mensual de Nutrition to Go",
-  "start_url": "/nutritiontogo-demo/cotizador-staging.html",
+  "start_url": "/nutritiontogo-demo/cotizador-original.html",
   "scope": "/nutritiontogo-demo/",
   "display": "standalone",
   "orientation": "portrait",

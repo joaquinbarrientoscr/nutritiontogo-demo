@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Cotizador — Nutrition to Go</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="apple-touch-icon" href="pwa-icon.svg">
-<link rel="manifest" href="manifest-cotiz.json">
+  <link rel="icon" type="image/svg+xml" href="favicon-staging.svg">
+  <link rel="apple-touch-icon" href="pwa-icon-staging.png">
+<link rel="manifest" href="manifest-staging.json">
 <meta name="theme-color" content="#d6e094">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,12 +24,13 @@
 }
 html,body{min-height:100%;background-color:var(--bg);background-image:url('ntg-bg.png');background-repeat:repeat;background-size:320px auto;font-family:var(--fb);color:var(--dk);}
 
-.app-hdr{background:var(--g);color:var(--gd);padding:10px 20px;
+.app-hdr{background:#fff;padding:10px 20px;
   display:flex;align-items:center;gap:14px;
   position:sticky;top:0;z-index:10;
-  box-shadow:0 2px 14px rgba(0,0,0,.2);}
-.app-hdr .hdr-logo{height:48px;width:auto;display:block;flex-shrink:0;}
-.app-hdr .sub{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.9);}
+  border-bottom:2px solid #eef5c8;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);}
+.app-hdr .hdr-logo{height:56px;width:auto;display:block;flex-shrink:0;}
+.app-hdr .sub{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gd);}
 
 .container{max-width:480px;margin:0 auto;padding:18px 14px 48px;}
 
@@ -125,7 +126,7 @@ html,body{min-height:100%;background-color:var(--bg);background-image:url('ntg-b
 </head>
 <body>
 <div class="app-hdr">
-  <img src="ntg-logo2-dark.svg" class="hdr-logo" alt="NTG">
+  <img src="ntg-logo.png" class="hdr-logo" alt="Nutrition to Go">
   <span class="sub">Cotizador de Paquetes</span>
 </div>
 
@@ -254,7 +255,6 @@ function calcOne(freq){
 }
 
 // ── Canvas helpers ────────────────────────────────────────────────────────────
-// rr(ctx, x, y, w, h, tl, tr, br, bl) — per-corner radii
 function rr(ctx,x,y,w,h,tl,tr,br,bl){
   if(tr===undefined)tr=tl; if(br===undefined)br=tl; if(bl===undefined)bl=tl;
   ctx.beginPath();
@@ -268,7 +268,7 @@ function rr(ctx,x,y,w,h,tl,tr,br,bl){
 
 // ── Logo preload ──────────────────────────────────────────────────────────────
 const LOGO_IMG = new Image();
-LOGO_IMG.src = 'ntg-logo2-dark.svg';
+LOGO_IMG.src = 'ntg-logo.png';
 
 // ── Combined image (semanal + mensual) ───────────────────────────────────────
 async function generateImage(){
@@ -315,33 +315,37 @@ async function generateImage(){
   c.fillStyle='#F7FAF2';
   rr(c,0,0,W,H,24); c.fill();
 
-  // ── Header ──
-  c.fillStyle='#a2c037';
+  // ── Header — fondo blanco ──
+  c.fillStyle='#fff';
   rr(c,0,0,W,HDR, 24,24,0,0); c.fill();
+  // borde inferior sutil
+  c.strokeStyle='#e8f0c8';
+  c.lineWidth=1.5;
+  c.beginPath(); c.moveTo(0,HDR); c.lineTo(W,HDR); c.stroke();
 
-  // Timestamp — apenas perceptible, borde superior del header
+  // Timestamp
   const _now=new Date();
   const _cr=new Date(_now.getTime()+(_now.getTimezoneOffset()+(-6*60))*60000);
   const _MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const _h=_cr.getHours(),_mi=_cr.getMinutes().toString().padStart(2,'0');
   const _ts=`Cotización generada: ${_cr.getDate()} de ${_MESES[_cr.getMonth()]} de ${_cr.getFullYear()} a las ${(_h%12)||12}:${_mi} ${_h>=12?'PM':'AM'} UTC-6`;
-  c.fillStyle='rgba(0,0,0,.45)';
+  c.fillStyle='rgba(0,0,0,.38)';
   c.font='400 12px Inter, sans-serif';
   c.textAlign='center';
   c.fillText(_ts,W/2,16);
 
-  // Logo izquierda
-  const logoH=80, logoW=Math.round(logoH*(435/325));
+  // Logo izquierda (cuadrado 1:1)
+  const logoH=96, logoW=96;
   c.drawImage(LOGO_IMG, PAD, (HDR-logoH)/2, logoW, logoH);
 
-  // Columna derecha: label + plan/gramaje (sin repetir nombre de marca)
+  // Columna derecha: label + plan/gramaje
   const gLbl=GRAM_LBL[s.gram]||(s.gram+'g');
   const rX=PAD+logoW+18;
   c.textAlign='left';
-  c.fillStyle='rgba(255,255,255,.72)';
-  c.font='600 13px Poppins, sans-serif';
+  c.fillStyle='#a2c037';
+  c.font='700 13px Poppins, sans-serif';
   c.fillText('COTIZACIÓN DE PAQUETES',rX,66);
-  c.fillStyle='#fff';
+  c.fillStyle='#3d4726';
   c.font='500 17px Inter, sans-serif';
   c.fillText(`${PLAN_LBL[s.plan]}  ·  ${gLbl} de proteína por platillo`,rX,90);
 
@@ -355,17 +359,14 @@ async function generateImage(){
 
     y+=SEC_PAD;
 
-    // Section label
     c.font='700 17px Poppins, sans-serif';
     c.textAlign='left';
     c.fillStyle=accent;
     c.fillText(fLbl.toUpperCase(),PAD,y+16);
-    // underline
     c.fillStyle=isAmb?'rgba(200,125,32,.3)':'rgba(74,94,31,.2)';
     c.fillRect(PAD,y+20,W-PAD*2,1);
     y+=50;
 
-    // Items
     items.forEach(item=>{
       const isDisc=item.t==='disc',isPrem=item.t==='prem',isEnvio=item.t==='envio';
       c.fillStyle=isDisc?'#2e5c1a':isPrem?'#C87D20':isEnvio?'#999':'#1A1A1A';
@@ -378,10 +379,8 @@ async function generateImage(){
 
     y+=2;
 
-    // Total block
     c.fillStyle=accentLight;
     rr(c,PAD-4,y,W-PAD*2+8,TOTAL_H,12); c.fill();
-    // Izquierda: label + sub — centrados verticalmente
     c.fillStyle=accent;
     c.font='700 14px Poppins, sans-serif';
     c.textAlign='left';
@@ -389,7 +388,6 @@ async function generateImage(){
     c.fillStyle=isAmb?'rgba(200,125,32,.78)':'rgba(61,71,38,.72)';
     c.font='500 12px Inter, sans-serif';
     c.fillText('Incluye envío',PAD+12,y+38);
-    // Derecha: precio centrado verticalmente (no baseline-align con label)
     c.fillStyle=accent;
     c.font='bold 32px Poppins, sans-serif';
     c.textAlign='right';
@@ -400,14 +398,12 @@ async function generateImage(){
 
   drawSection(semIt,sem,'semanal');
 
-  // ── Divider between sections ──
   c.fillStyle='rgba(74,94,31,.1)';
   c.fillRect(PAD,y,W-PAD*2,2);
   y+=DIVIDER;
 
   drawSection(menIt,men,'mensual');
 
-  // ── Premium note ──
   if(hasPrem){
     const sp=PR[s.plan].semanal, mp=PR[s.plan].mensual;
     y+=4;
@@ -521,7 +517,7 @@ document.getElementById('installBtn').addEventListener('click',async()=>{
   deferredPrompt=null;
   document.getElementById('installBar').classList.remove('show');
 });
-if('serviceWorker'in navigator)navigator.serviceWorker.register('sw-cotiz.js').catch(()=>{});
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw-staging.js').catch(()=>{});
 </script>
 </body>
 </html>

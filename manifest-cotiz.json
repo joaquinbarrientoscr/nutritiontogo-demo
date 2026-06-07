@@ -2,7 +2,7 @@
   "name": "Cotizador — Nutrition to Go",
   "short_name": "NTG Cotizador",
   "description": "Calculá el costo de tu paquete semanal o mensual de Nutrition to Go",
-  "start_url": "/nutritiontogo-demo/cotizador-original.html",
+  "start_url": "/nutritiontogo-demo/cotizador.html",
   "scope": "/nutritiontogo-demo/",
   "display": "standalone",
   "orientation": "portrait",
